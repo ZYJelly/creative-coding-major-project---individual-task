@@ -23,11 +23,14 @@ let firework17;
 let cycleDuration = 2000;
 let whiteDots = [];
 let isFireworksPlaying = false; 
+let displayText = true;
+let textTimer;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
   background(18, 88, 116);
   angleMode(DEGREES);
+  textTimer = millis();
 
   // Create 17 fireworks
   firework1 = new Firework(0.14 * width, 0.13 * height, 0.5, 1);
@@ -85,6 +88,18 @@ function draw() {
   for (let dot of whiteDots) {
     dot.show();
   }
+
+  // Display the instruction text within the first 3 seconds
+  if (displayText && millis() - textTimer < 3000) {
+    fill(255);
+    noStroke();
+    textSize(16); 
+    textAlign(CENTER, CENTER);
+    text("Click the mouse to start or pause the fireworks. Press the space bar to gradually turn the fireworks red over 5 seconds or to restore them.", width / 2, height / 2);
+  } else {
+    displayText = false; // Stop displaying the text after 3 seconds
+  }
+
   
   //Set the fireworks to bloom at regular intervals
   if (isFireworksPlaying) {
@@ -99,17 +114,17 @@ function draw() {
   }
 }
 
-// 遍历所有烟花来处理颜色变化
+// Iterate over all the fireworks to change colour to red
 for (let fw of fireworks) {
   if (fw.colorTransition) {
     let transitionTime = millis() - fw.colorTransitionStart;
-    let transitionDuration = 5000; // 五秒钟过渡
+    let transitionDuration = 5000; // Transition over five seconds.
     if (transitionTime <= transitionDuration) {
       let amt = map(transitionTime, 0, transitionDuration, 0, 1);
       fw.FireworkColor = lerpColor(fw.originalFireworkColor, color('red'), amt);
     } else {
       fw.FireworkColor = fw.originalFireworkColor;
-      fw.colorTransition = false; // 结束颜色变化
+      fw.colorTransition = false; 
     }
   }
 
@@ -164,14 +179,14 @@ class Firework {
     this.circleColor3 = color(random(colors3));
     this.circleColor4 = color(random(colors3));
 
-   // 新增属性
-   this.colorTransition = false;
+    //set colour transition
+    this.colorTransition = false;
     this.colorTransitionStart = 0;
-    this.originalFireworkColor = this.FireworkColor; // 存储原始颜色
+    this.originalFireworkColor = this.FireworkColor; 
   }
 
 
-// 新增方法，用于开始和停止颜色的过渡
+// start or stop colour transition
   toggleColorTransition() {
   this.colorTransition = !this.colorTransition; // 切换颜色变化状态
     this.colorTransitionStart = millis(); // 记录开始变化的时间
@@ -189,7 +204,7 @@ class Firework {
     let t = (time % cycleDuration) / cycleDuration; 
     let size = map(t, 0, 1, 0, min(windowWidth, windowHeight) / 6);
 
-    // 进行颜色过渡处理
+    // handle the colour transition
     if (this.transitionToRed) {
       let transitionTime = millis() - this.transitionStartTime;
       let lerpAmt = map(transitionTime, 0, 5000, 0, 1);
@@ -267,7 +282,7 @@ function mousePressed() {
 }
 
 function keyPressed() {
-  if (key === '1') {
+  if (key === ' ') {
     for (let fw of fireworks) {
       fw.toggleColorTransition();
     }
